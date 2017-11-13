@@ -20,14 +20,27 @@ namespace TSA.Mongo.Test
             var col = GetCollection<PessoaDto>("pessoa");
             col.InsertMany(dados);
         }
+        [TestMethod]
+        public void GetOne()
+        {
+            var col = GetCollection<PessoaDto>("pessoa");
+            var filter = Builders<PessoaDto>.Filter.Eq(s => s.IdDto, "5a067f6e7e2bb73260f02389");
+            var result = col.Find(filter).ToList();
+        }
 
         [TestMethod]
         public void Update()
         {
             var col = GetCollection<PessoaDto>("pessoa");
-            var filter = Builders<PessoaDto>.Filter.Eq("_id", "b9b04ead-71cd-2544-af00-6916da538445");
-            var update = Builders<PessoaDto>.Update.Set("Telefones.Operadora", "5");
-            var result = col.UpdateOne(filter, update);
+            var _id = new ObjectId("5a067f6e7e2bb73260f02389");
+            var filter = Builders<PessoaDto>.Filter.Eq(s=>s.IdDto, _id);
+
+            //var update = Builders<PessoaDto>.Update.Set(s=>s.Situacao, 2);
+
+            //var update = Builders<PessoaDto>.Update.Set("Telefones.$.Operadora", "6");
+            var update = Builders<PessoaDto>.Update.Set("Situacao", "6");
+
+            var result = col.UpdateMany(filter, update);
         }
 
         private IMongoCollection<T> GetCollection<T>(string collectionName) where T : class
