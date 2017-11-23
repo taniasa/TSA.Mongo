@@ -20,6 +20,18 @@ namespace TSA.Mongo.Test
             var col = GetCollection<PessoaDto>("pessoa");
             col.InsertMany(dados);
         }
+
+        [TestMethod]
+        public void InsertMany()
+        {
+            var rep = new PessoaRepository();
+            var dados = rep.BuscarPessoas();
+
+            IMongoTSA tsa = new MongoTSA();
+            tsa.AddRange("chaveTania", dados);
+
+        }
+
         [TestMethod]
         public void GetOne()
         {

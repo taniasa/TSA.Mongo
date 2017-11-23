@@ -6,7 +6,7 @@ using System.Text;
 
 namespace TSA.Mongo.Entities
 {
-    public class Pessoa : IEntityIdentity
+    public class Pessoa : IEntityIdentity, IDto
     {
         public Int64 Id { get; set; }
         public string Nome { get; set; }
@@ -15,6 +15,8 @@ namespace TSA.Mongo.Entities
         public string NomeSoundex { get; set; }
         public int Situacao { get; set; }
         public ICollection<Telefone> Telefones { get; set; }
+        public string Key { get; set; }
+
         public Pessoa()
         {
             Telefones = new List<Telefone>();
@@ -33,5 +35,11 @@ namespace TSA.Mongo.Entities
     public interface IEntityIdentity
     {
         long Id { get; set; }
+    }
+
+    public interface IDto
+    {
+        string Key { get; set; }
+
     }
 }
