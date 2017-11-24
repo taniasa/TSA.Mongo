@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq.Expressions;
 using System.Text;
 using TSA.Mongo.Entities;
 
@@ -40,14 +41,14 @@ namespace TSA.Mongo.Mongo
         /// </summary>
         /// <param name="key"></param>
         /// <returns></returns>
-        bool Remove(string key);
+        bool Remove<TEntity>(string key) where TEntity : class, IDto;
         /// <summary>
         /// Deleta o primeiro encontrado de acordo com a condição
         /// </summary>
         /// <param name="key">Chave</param>
         /// <param name="predicate">Condição</param>
         /// <returns></returns>
-        bool Remove<TEntity>(string key, Func<TEntity, bool> predicate) where TEntity : class;
+        bool Remove<TEntity>(string key, Expression<Func<TEntity, bool>> predicate) where TEntity : class, IDto;
 
         /// <summary>
         /// Deletar todos encontrados de acordo com a condição
@@ -94,7 +95,7 @@ namespace TSA.Mongo.Mongo
         /// </summary>
         /// <param name="key"></param>
         /// <returns></returns>
-        List<TEntity> GetAll<TEntity>(string key) where TEntity : class;
+        List<TEntity> GetAll<TEntity>(string key) where TEntity : class, IDto;
 
         /// <summary>
         /// 
@@ -102,7 +103,7 @@ namespace TSA.Mongo.Mongo
         /// <param name="key"></param>
         /// <param name="predicate"></param>
         /// <returns></returns>
-        List<TEntity> GetAll<TEntity>(string key, Func<TEntity, bool> predicate) where TEntity : class;
+        List<TEntity> GetAll<TEntity>(string key, Expression<Func<TEntity, bool>> predicate) where TEntity : class, IDto;
 
         /// <summary>
         /// 
@@ -111,6 +112,6 @@ namespace TSA.Mongo.Mongo
         /// <param name="key"></param>
         /// <param name="predicate"></param>
         /// <returns></returns>
-        TEntity GetFirstOrDefault<TEntity>(string key, Func<TEntity, bool> predicate) where TEntity : class;
+        TEntity GetFirstOrDefault<TEntity>(string key, Func<TEntity, bool> predicate) where TEntity : class, IDto;
     }
 }

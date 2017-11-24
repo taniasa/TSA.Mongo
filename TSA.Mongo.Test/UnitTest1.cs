@@ -28,8 +28,29 @@ namespace TSA.Mongo.Test
             var dados = rep.BuscarPessoas();
 
             IMongoTSA tsa = new MongoTSA();
-            tsa.AddRange("chaveTania", dados);
+            tsa.AddRange("chaveTania1", dados);
 
+        }
+
+        [TestMethod]
+        public void GetAllWithFilter()
+        {
+            IMongoTSA tsa = new MongoTSA();
+            var teste = tsa.GetAll<PessoaDto>("chaveTania1", w=>w.Nome.ToLower().Contains("tania"));
+        }
+
+        [TestMethod]
+        public void RemoveAll()
+        {
+            IMongoTSA tsa = new MongoTSA();
+            var teste = tsa.Remove<PessoaDto>("chaveTania1");
+        }
+
+        [TestMethod]
+        public void RemovePredicate()
+        {
+            IMongoTSA tsa = new MongoTSA();
+            var teste = tsa.Remove<PessoaDto>("chaveTania1", x=> x.Id == 1);
         }
 
         [TestMethod]

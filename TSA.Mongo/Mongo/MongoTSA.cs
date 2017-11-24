@@ -1,6 +1,8 @@
-﻿using MongoDB.Driver;
+﻿using LinqKit;
+using MongoDB.Driver;
 using System;
 using System.Collections.Generic;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 using TSA.Mongo.Entities;
@@ -26,12 +28,12 @@ namespace TSA.Mongo.Mongo
         {
             var collection = GetCollection<TEntity>(typeof(TEntity).Name);
             //return Enumerable.Empty<TEntity>();
-            //foreach (var item in values)
-            //    item.Key = key;
+            foreach (var item in values)
+                item.Key = key;
             collection.InsertMany(values);
             //});
 
-
+            //await collection.InsertManyAsync(documents);
             //var models = new List<WriteModel<TEntity>>();
             //foreach (var item in values)
             //{
@@ -41,29 +43,19 @@ namespace TSA.Mongo.Mongo
             return true;
         }
 
-
-
-        //bool IMongoTSA.AddRangeAsync<TEntity>(string key, List<TEntity> values)
-        //{
-        //    var collection = GetCollection<TEntity>(nameof(TEntity));
-
-        //    //foreach (var item in values)
-        //    //    item.Key = key;
-        //    Task.Run(async () =>
-        //    {
-        //        collection.InsertMany(values);
-        //    };
-        //    return true;
-        //}
-
         List<TEntity> IMongoTSA.GetAll<TEntity>(string key)
         {
-            throw new NotImplementedException();
+            var collection = GetCollection<TEntity>(typeof(TEntity).Name);
+            var retorno = collection.Find<TEntity>(s => s.Key == key).ToListAsync();
+            return retorno.Result;
         }
 
-        List<TEntity> IMongoTSA.GetAll<TEntity>(string key, Func<TEntity, bool> predicate)
+        List<TEntity> IMongoTSA.GetAll<TEntity>(string key, Expression<Func<TEntity, bool>> predicate) 
         {
-            throw new NotImplementedException();
+            var collection = GetCollection<TEntity>(typeof(TEntity).Name);
+            predicate = predicate.And(w => w.Key == key);
+            var retorno = collection.Find<TEntity>(predicate).ToListAsync();
+            return retorno.Result;
         }
 
         TEntity IMongoTSA.GetFirstOrDefault<TEntity>(string key, Func<TEntity, bool> predicate)
@@ -71,14 +63,19 @@ namespace TSA.Mongo.Mongo
             throw new NotImplementedException();
         }
 
-        bool IMongoTSA.Remove(string key)
+        bool IMongoTSA.Remove<TEntity>(string key)
         {
-            throw new NotImplementedException();
+            var collection = GetCollection<TEntity>(typeof(TEntity).Name);
+            var retorno = collection.DeleteMany<TEntity>(w => w.Key == key);
+            return retorno.DeletedCount > 0;
         }
 
-        bool IMongoTSA.Remove<TEntity>(string key, Func<TEntity, bool> predicate)
+        bool IMongoTSA.Remove<TEntity>(string key, Expression<Func<TEntity, bool>> predicate)
         {
-            throw new NotImplementedException();
+            predicate = predicate.And(w => w.Key == key);
+            var collection = GetCollection<TEntity>(typeof(TEntity).Name);
+            var retorno = collection.DeleteMany<TEntity>(predicate);
+            return retorno.DeletedCount > 0;
         }
 
         int IMongoTSA.RemoveRange<TEntity>(string key, Func<TEntity, bool> predicate)
