@@ -1,6 +1,7 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MongoDB.Bson;
 using MongoDB.Driver;
+using Newtonsoft.Json;
 using System;
 using TSA.Mongo.Dto;
 using TSA.Mongo.Entities;
@@ -26,17 +27,57 @@ namespace TSA.Mongo.Test
         {
             var rep = new PessoaRepository();
             var dados = rep.BuscarPessoas();
-
+            var total = dados.Count;
             IMongoTSA tsa = new MongoTSA();
+            Help.Restart();
             tsa.AddRange("chaveTania1", dados);
+            Help.Stop($"Total insert many: {total}");
+        }
+
+        [TestMethod]
+        public void InsertManyText()
+        {
+            var rep = new PessoaRepository();
+            var dados = rep.BuscarPessoas();
+            var total = dados.Count;
+            IMongoTSA tsa = new MongoTSA();
+            Help.Restart();
+            //foreach (var item in dados)
+            //    item.Key = "chaveTania1";
+            var values=  JsonConvert.SerializeObject(dados);
+
+            tsa.AddRanges<PessoaDto>("chaveTania1", values);
+            Help.Stop($"Total insert many: {total}");
 
         }
+
+        [TestMethod]
+        public void InsertManyAsync()
+        {
+            InsertManyAsyncInt();
+        }
+
+        public void InsertManyAsyncInt()
+        {
+            var rep = new PessoaRepository();
+            var dados = rep.BuscarPessoas();
+            System.IO.File.WriteAllText(Help.FileJson, JsonConvert.SerializeObject(dados));
+            var total = dados.Count;
+            IMongoTSA tsa = new MongoTSA();
+            Help.Restart();
+            tsa.AddRangeAsync("chaveTania1", dados);
+
+            Help.Stop($"Total insert many: {total}");
+
+        }
+
+
 
         [TestMethod]
         public void GetAllWithFilter()
         {
             IMongoTSA tsa = new MongoTSA();
-            var teste = tsa.GetAll<PessoaDto>("chaveTania1", w=>w.Nome.ToLower().Contains("tania"));
+            var teste = tsa.GetAll<PessoaDto>("chaveTania1", w => w.Nome.ToLower().Contains("tania"));
         }
 
         [TestMethod]
@@ -50,7 +91,7 @@ namespace TSA.Mongo.Test
         public void RemovePredicate()
         {
             IMongoTSA tsa = new MongoTSA();
-            var teste = tsa.Remove<PessoaDto>("chaveTania1", x=> x.Id == 1);
+            var teste = tsa.Remove<PessoaDto>("chaveTania1", x => x.Id == 1);
         }
 
         [TestMethod]
@@ -66,7 +107,7 @@ namespace TSA.Mongo.Test
         {
             var col = GetCollection<PessoaDto>("pessoa");
             var _id = new ObjectId("5a067f6e7e2bb73260f02389");
-            var filter = Builders<PessoaDto>.Filter.Eq(s=>s.IdDto, _id);
+            var filter = Builders<PessoaDto>.Filter.Eq(s => s.IdDto, _id);
             //teste/
             //var update = Builders<PessoaDto>.Update.Set(s=>s.Situacao, 2);
 

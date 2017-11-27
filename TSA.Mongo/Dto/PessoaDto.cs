@@ -17,6 +17,11 @@ namespace TSA.Mongo.Dto
         public IEnumerable<TelefoneDto> Telefones { get; set; }
         public string Key { get; set; }
 
+
+
+
+
+
         public PessoaDto()
         {
             Telefones = new List<TelefoneDto>();

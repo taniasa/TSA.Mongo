@@ -1,4 +1,6 @@
 ﻿using LinqKit;
+using MongoDB.Bson;
+using MongoDB.Bson.Serialization;
 using MongoDB.Driver;
 using System;
 using System.Collections.Generic;
@@ -19,19 +21,51 @@ namespace TSA.Mongo.Mongo
             return col;
         }
 
+        private IMongoCollection<BsonDocument> GetCollectioBson(string collectionName)
+        {
+            var client = new MongoClient("mongodb://localhost:27017");
+            var database = client.GetDatabase("Sorriso");
+            var col = database.GetCollection<BsonDocument>(collectionName);
+            return col;
+        }
+
         bool IMongoTSA.Add<TEntity>(string key, TEntity value)
         {
             throw new NotImplementedException();
         }
-
-        bool IMongoTSA.AddRange<TEntity>(string key, List<TEntity> values) 
+        async Task IMongoTSA.AddRangeAsync<TEntity>(string key, List<TEntity> values)
         {
+            var collection = GetCollectioBson(typeof(TEntity).Name);
+            string text = System.IO.File.ReadAllText(Help.FileJson);
+
+            var document = BsonSerializer.Deserialize<BsonDocument[]>(text);
+            //foreach (var item in values)
+            //    item.Key = key;
+            //collection.InsertMany(values);
+            var task = collection.InsertManyAsync(document);
+            task.GetAwaiter();
+        }
+
+        bool IMongoTSA.AddRanges<TEntity>(string key, string values)
+        {
+            var collection = GetCollectioBson(typeof(TEntity).Name);
+
+            var document = BsonSerializer.Deserialize<BsonDocument[]>(values);
+            collection.InsertMany(document);
+            return true;
+        }
+
+        bool IMongoTSA.AddRange<TEntity>(string key, List<TEntity> values)
+        {
+
             var collection = GetCollection<TEntity>(typeof(TEntity).Name);
             //return Enumerable.Empty<TEntity>();
             foreach (var item in values)
                 item.Key = key;
             collection.InsertMany(values);
-            //});
+            //awiat collection.InsertManyAsync(values);
+
+            ////});
 
             //await collection.InsertManyAsync(documents);
             //var models = new List<WriteModel<TEntity>>();
@@ -43,6 +77,7 @@ namespace TSA.Mongo.Mongo
             return true;
         }
 
+
         List<TEntity> IMongoTSA.GetAll<TEntity>(string key)
         {
             var collection = GetCollection<TEntity>(typeof(TEntity).Name);
@@ -50,7 +85,7 @@ namespace TSA.Mongo.Mongo
             return retorno.Result;
         }
 
-        List<TEntity> IMongoTSA.GetAll<TEntity>(string key, Expression<Func<TEntity, bool>> predicate) 
+        List<TEntity> IMongoTSA.GetAll<TEntity>(string key, Expression<Func<TEntity, bool>> predicate)
         {
             var collection = GetCollection<TEntity>(typeof(TEntity).Name);
             predicate = predicate.And(w => w.Key == key);

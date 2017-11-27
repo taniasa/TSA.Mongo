@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Text;
+using System.Threading.Tasks;
 using TSA.Mongo.Entities;
 
 namespace TSA.Mongo.Mongo
@@ -66,6 +67,7 @@ namespace TSA.Mongo.Mongo
         /// <param name="value">O valor.</param>
         bool Add<TEntity>(string key, TEntity value) where TEntity : class;
 
+        Task AddRangeAsync<TEntity>(string key, List<TEntity> values) where TEntity : class, IDto;
         ///// <summary>
         ///// 
         ///// </summary>
@@ -81,6 +83,8 @@ namespace TSA.Mongo.Mongo
         /// <param name="values"></param>
         /// <returns></returns>
         bool AddRange<TEntity>(string key, List<TEntity> values) where TEntity : class, IDto;
+
+        bool AddRanges<TEntity>(string key, string values) where TEntity : class, IDto;
 
         ///// <summary>
         ///// 
