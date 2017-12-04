@@ -7,7 +7,7 @@ namespace TSA.Mongo.Dto
 {
     public class PessoaDto : IEntityIdentity, IDto
     {
-        public object IdDto { get; set; }
+        public string IdDto { get; set; }
         public Int64 Id { get; set; }
         public string Nome { get; set; }
         public DateTime DataCadastro { get; set; }

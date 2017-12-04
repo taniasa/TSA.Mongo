@@ -1,5 +1,7 @@
-﻿using MongoDB.Bson.Serialization;
+﻿using MongoDB.Bson;
+using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.IdGenerators;
+using MongoDB.Bson.Serialization.Serializers;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -15,7 +17,9 @@ namespace TSA.Mongo.Mongo
                 {
                     x.AutoMap();
                     x.SetIdMember(x.GetMemberMap(c => c.IdDto));
-                    x.IdMemberMap.SetIdGenerator(ObjectIdGenerator.Instance);
+                    //x.IdMemberMap.SetIdGenerator(ObjectIdGenerator.Instance);
+                    x.IdMemberMap.SetIdGenerator(StringObjectIdGenerator.Instance)
+                    .SetSerializer(new StringSerializer(BsonType.ObjectId));
                 });
         }
     }
